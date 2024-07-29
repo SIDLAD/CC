@@ -33,4 +33,4 @@ template <typename T, typename... V>
 T& _dbg(const char *s, T &t, V&... v) {cerr << "[" << s << "] = ["; _print(t,v...);return t;}
 void _dbg(const char *s) {cerr << "\n";};
 
-#define debug(x...) (_dbg(#x , x))
+#define debug(x...) (_dbg(#x __VA_OPT__(,) x))
