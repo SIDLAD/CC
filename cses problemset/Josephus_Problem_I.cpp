@@ -46,14 +46,26 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    set<int> s;
+    for(int i=1;i<=n;i++)s.insert(i);
+
+    auto curitr = s.begin();
+    curitr++;
+    if(curitr == s.end())curitr = s.begin();
+
+    while(s.size())
     {
-        b = a+b;
-        a = b-a;
-        i++;
+
+        auto nextitr = ++curitr;
+        --curitr;
+        if(nextitr == s.end())nextitr = s.begin();
+        nextitr++;
+        if(nextitr == s.end())nextitr = s.begin();
+        auto nextval = *nextitr;
+        cout<<*curitr<<" ";
+        s.erase(curitr);
+        curitr = s.find(nextval);
     }
-    cout<<i<<endl;
 }

@@ -46,14 +46,28 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int x,n;
+    cin>>x>>n;
+    multiset<int> ms;
+    multiset<pair<int,int>> ds;
+    ms.insert(x);
+    ds.insert({0,x});
+    for(int i=0;i<n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int y;
+        cin>>y;
+        auto [start,end] = * --ds.upper_bound({y,0});
+        debug(start,end);
+        ds.erase({start,end});
+        ds.insert({start,y});
+        ds.insert({y,end});
+        ms.erase(ms.lower_bound(end-start));
+        
+
+        ms.insert(y - start);
+
+
+        ms.insert(end - y);
+        cout<<*ms.rbegin()<<" ";
     }
-    cout<<i<<endl;
 }

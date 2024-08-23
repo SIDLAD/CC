@@ -46,14 +46,27 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    vector<pair<int,bool>> v(2*n);
+    for(int i=0;i<n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        cin>>v[2*i].first;
+        cin>>v[2*i+1].first;
+        v[2*i].second = true;
+        v[2*i + 1].second = false;
     }
-    cout<<i<<endl;
+    sort(all(v));
+    int ans = 0;
+    int max_ans = 0;
+    for(int i=0;i<2*n;i++)
+    {
+        if(v[i].second)
+        {
+            ans ++;
+            max_ans = max(ans,max_ans);
+        }
+        else ans--;
+    }
+    cout<<max_ans<<endl;
 }

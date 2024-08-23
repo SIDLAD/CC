@@ -46,14 +46,23 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    int fivepow = 5;
+    int fivecount = 0;
+    while(fivepow <= n)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        fivecount += n/fivepow;
+        fivepow *= 5;
     }
-    cout<<i<<endl;
+
+    int twopow = 2;
+    int twocount = 0;
+    while(twopow <= n)
+    {
+        twocount += n/twopow;
+        twopow *= 2;
+    }
+
+    cout<<min(fivecount,twocount)<<endl;
 }

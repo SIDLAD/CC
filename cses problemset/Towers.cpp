@@ -46,14 +46,25 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    vector<int> v(n);
+    for(int i=0;i<n;i++)cin>>v[i];
+    multiset<int> s;
+    int ans = 0;
+    for(int i=0;i<n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        if(s.upper_bound(v[i]) == s.end())
+        {
+            ans++;
+            s.insert(v[i]);
+        }
+        else
+        {
+            auto x = s.upper_bound(v[i]);
+            s.erase(x);
+            s.insert(v[i]);
+        }
     }
-    cout<<i<<endl;
+    cout<<ans<<endl;
 }

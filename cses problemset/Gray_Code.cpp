@@ -46,14 +46,22 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    for(int i=0;i<(1<<n);i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int j = i;
+        for(int k = n-1;k>=0;k--)
+        {
+            if(k==n-1)
+            {
+                cout<<debug(((j&(1<<k)) > 0), j, k);
+            }
+            else
+            {
+                cout<<(((j&(1<<k)) > 0)^((j&(1<<k+1)) > 0));
+            }
+        }
+        cout<<endl;
     }
-    cout<<i<<endl;
 }

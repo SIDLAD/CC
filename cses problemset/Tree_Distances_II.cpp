@@ -46,14 +46,45 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
+    int n;
+    cin>>n;
+    vector<vector<int>> edges(n,vector<int>(0));
     int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    for(int i=1;i<n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        cin>>a>>b;
+        a--,b--;
+        edges[a].push_back(b);
+        edges[b].push_back(a);
     }
-    cout<<i<<endl;
+
+    vector<int> answer(n);
+    vector<int> succcount(n);
+    auto dfs1 = [&](auto self, auto x, auto p) ->void
+    {
+        for(auto v: edges[x])if(v!=p)
+        {
+            self(self,v,x);
+            succcount[x] += succcount[v] + 1;
+            answer[x] += answer[v] + succcount[v] + 1;
+        }
+    };
+    dfs1(dfs1,0,-1);
+    debug(answer);
+    auto dfs2 = [&](auto self, auto x, auto p) -> void
+    {
+        if(p >=0)
+        {
+            auto revsucccount = n-(succcount[x] + 1);
+            auto restans = answer[p] - (answer[x] + succcount[x] + 1);
+            answer[x] += restans + revsucccount;
+        }
+        for(auto v: edges[x])if(v!=p)
+        self(self,v,x);
+    };
+    dfs2(dfs2,0,-1);
+    for(int i=0;i<n;i++)
+    {
+        cout<<answer[i]<<" ";
+    }
 }

@@ -46,14 +46,37 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n,k;
+    cin>>n>>k;
+    int srt = (int)sqrt(n);
+
+    int len = (n+srt-1)/srt;
+    
+
+    vector<vector<int>> v(len,vector<int>(0));
+
+    for(int i=0,j=0,k=0;i<n;i++,j=(j+1)%srt,k = k + (j==0))
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        v[k].push_back(i+1);
     }
-    cout<<i<<endl;
+    
+    int ptr1=0,ptr2=0;
+    for(int i=n;i>0;i--)
+    {
+        int rem = (k)%i + 1;
+        while(v[ptr1].size() - ptr2 < rem)
+        {
+            rem -= v[ptr1].size() - ptr2;
+            ptr1 = (ptr1 + 1)%len;
+            ptr2 = 0;
+        }
+        ptr2 += (rem - 1);
+
+        cout<<v[ptr1][ptr2]<<" ";
+        for(int k=ptr2;k<v[ptr1].size() - 1;k++)
+        {
+            v[ptr1][k] = v[ptr1][k + 1];
+        }
+        v[ptr1].pop_back();
+    }
 }

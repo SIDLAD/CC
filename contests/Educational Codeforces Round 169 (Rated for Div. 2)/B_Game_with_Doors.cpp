@@ -34,6 +34,8 @@ using namespace std;
     #include </home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>
 #endif
 
+using namespace std;
+
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
@@ -46,14 +48,27 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int l,r,L,R;
+        cin>>l>>r>>L>>R;
+        int overlapstart = max(l,L);
+        int overlapend = min(r,R);
+
+        if(overlapstart > overlapend)
+        {
+            cout<<1<<endl;
+            continue;
+        }
+
+        else
+        {
+            int overlapextent = overlapend-overlapstart + 1;
+            int addleft = (min(l,L) < overlapstart);
+            int addRight = (max(R,r) > overlapend);
+            cout<<overlapextent - 1 + addleft +addRight<<endl;
+        }
     }
-    cout<<i<<endl;
 }

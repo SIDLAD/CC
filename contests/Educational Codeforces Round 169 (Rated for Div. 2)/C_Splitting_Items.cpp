@@ -34,6 +34,8 @@ using namespace std;
     #include </home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>
 #endif
 
+using namespace std;
+
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
@@ -46,14 +48,35 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int n,k;
+        cin>>n>>k;
+        vector<int> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+        sort(all(v));
+        int a=0,b=0;
+        bool at = true;
+        for(int i=n-1;i>=0;i--)
+        {
+            if(at)a += v[i];
+            else b += v[i];
+
+            at = !at;
+        }
+
+        int diff = a - b;
+        int minans = (v.size()&1?v[0]:0);
+
+        if(k >= diff-minans)
+        {
+            cout<<minans<<endl;
+        }
+        else
+        {
+            cout<<diff- k<<endl;
+        }
     }
-    cout<<i<<endl;
 }

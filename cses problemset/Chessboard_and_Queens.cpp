@@ -40,20 +40,56 @@ using namespace std;
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 #define endl "\n" //comment out for interactive problems
 
+bool are_attacking(int i, int j)
+{
+    if(i/8 == j/8)return true;
+    if(i%8 == j%8)return true;
+    if(i/8 + i%8 == j/8 + j%8)return true;
+    if(i/8 + j%8 == j/8 + i%8)return true;
+    return false;
+}
+
+bool is_valid_pos(vector<int>& v)
+{
+    for(int i=0;i<v.size();i++)
+    {
+        for(int j=i+1;j<v.size();j++)
+        {
+            if(are_attacking(v[i],v[j]))return false;
+        }
+    }
+    if(v.size() == 8)debug(v);
+
+    return true;
+}
+
+int count_positions(int remaining_queens, int cur_square, vector<int>& current_queen_positions,vector<vector<char>>& v)
+{
+    if(remaining_queens == 0)return 1;
+    int ans = 0;
+    for(int i=cur_square;i<64;i++)
+    {
+        if(v[i/8][i%8] == '*')continue;
+        vector<int> copy = current_queen_positions;
+        copy.push_back(i);
+        if(is_valid_pos(copy))ans += count_positions(remaining_queens - 1, i + 1, copy, v);
+    }
+    return ans;
+}
+
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+
+    vector<vector<char>> v(8,vector<char>(8));
+    for(int i=0;i<8;i++)for(int j=0;j<8;j++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        cin>>v[i][j];
     }
-    cout<<i<<endl;
+    debug(v[7][4], 7*8 + 4);
+    vector<int> empty ={};
+    cout<<count_positions(8,0,empty,v)<<endl;
 }

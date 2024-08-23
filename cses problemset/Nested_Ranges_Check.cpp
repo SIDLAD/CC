@@ -46,14 +46,51 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    vector<array<int,3>> v(n);
+    for(int i=0;i<n;i++)cin>>v[i][0]>>v[i][1],v[i][2] = i;
+
+    sort(all(v), [](array<int,3>& a,array<int,3> & b){
+        if(a[0] == b[0])return a[1] > b[1];
+        return a[0] < b[0];
+    });
+
+    int max_min = INF;
+    vector<int> ans1(n);
+    for(int i=n-1;i>=0;i--)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        ans1[v[i][2]] = v[i][1] >= max_min || (i!=0 and v[i] == v[i-1]);
+        max_min = min(v[i][1],max_min);
     }
-    cout<<i<<endl;
+    for(int i=0;i<n;i++)cout<<ans1[i]<<" ";
+    cout<<endl;
+
+    
+    int min_max = -INF;
+    vector<int> ans2(n);
+    for(int i=0;i<n;i++)
+    {
+        ans2[v[i][2]] = v[i][1] <= min_max || (i!=n-1 and v[i] == v[i+1]);
+        min_max = max(v[i][1],min_max);
+    }
+    for(int i=0;i<n;i++)
+    {
+        cout<<ans2[i]<<' ';
+    }
+    cout<<endl;
+    
+    // sort(all(v),[](pair<int,int>& a, pair<int,int>& b){
+    //     return a.second < b.second;
+    // }
+    // );
+
+    // int min_min = INF;
+    // for(int i=n-1;i>=0;i--)
+    // {
+    //     if(v[i].first >= min_min)cout<<1<<" ";
+    //     else cout<<0<<" ";
+    //     min_min = min(min_min, v[i].first);   
+    // }
+    // cout<<endl;
 }

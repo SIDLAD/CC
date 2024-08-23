@@ -46,14 +46,23 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    vector<int> v(n);
+    for(int i=0;i<n;i++)cin>>v[i];
+    int partial_sum = 0;
+    int max_sum = *max_element(all(v));
+    for(int i=0;i<n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        if(partial_sum  + v[i] <= 0)
+        {
+            partial_sum = 0;
+        }
+        else
+        {
+            partial_sum += v[i];
+            max_sum = max(max_sum, partial_sum);
+        }
     }
-    cout<<i<<endl;
+    cout<<max_sum<<endl;
 }

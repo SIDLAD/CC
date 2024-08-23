@@ -39,21 +39,38 @@ using namespace std;
 #define all(x) (x).begin(),(x).end()
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 #define endl "\n" //comment out for interactive problems
-
+pair<int,int> add_modulo(pair<int,int>& a,int add, int lim)
+{
+    pair<int,int> ans = a;
+    ans.second += add;
+    if(ans.second > lim)
+    {
+        ans.second = add;
+        ans.first ++;
+    }
+    return ans;
+}
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n,x;
+    cin>>n>>x;
+    vector<int> w(n);
+    for(int i=0;i<n;i++)cin>>w[i];
+
+    vector<pair<int,int>> dp((int)(1<<21),{INF,INF});
+    dp[0] = {0,x};
+    for(int i=0;i<dp.size();i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        for(int bit=n-1;bit>=0;bit--)
+        {
+            if(i&(1<<bit))continue;
+            dp[i|(1<<bit)] = min(dp[i|(1<<bit)], add_modulo(dp[i],w[bit],x));
+        }
     }
-    cout<<i<<endl;
+    cout<<dp[(1<<n) - 1].first<<endl;
+    // debug(dp);
 }

@@ -46,14 +46,36 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    string s;
+    cin>>s;
+    int n = s.length();
+    map<char,int> mp;
+    for(int i=0;i<n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        mp[s[i]]++;
     }
-    cout<<i<<endl;
+
+    vector<char> ans(n + 1,0);
+    int i = 0;
+    int check = 0;
+    for(auto [ele,count]:mp)
+    {
+        if(count%2){
+            check++;
+            ans[n/2] = ele;
+        }
+        
+        {
+            for(int j=0;j<count/2;j++)
+            {ans[n-i-1] = ans[i] = ele;i++;}
+        }
+    }
+    debug(mp,check);
+    debug(ans);
+    if(check < 2)
+    {
+        for(auto ele: ans)if(ele!=0)cout<<ele;
+    }
+    else cout<<"NO SOLUTION";
+    cout<<endl;
 }

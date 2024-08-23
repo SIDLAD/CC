@@ -34,11 +34,41 @@ using namespace std;
     #include </home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>
 #endif
 
+using namespace std;
+
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
+#define cout(x) x?cout<<"Bob"<<endl:cout<<"Alice"<<endl
 #define endl "\n" //comment out for interactive problems
+#define limit (int)1e7
+
+// int grundy[limit + 1] = {};
+vector<int> grundy(limit + 1,-1);
+
+void cool_sieve()
+{
+    grundy[0] = 0;
+    grundy[1] = 1;
+    
+    int x = 0;
+    int i;
+    for(i=2;i*i<=limit;i++)
+    {
+        if(grundy[i] != -1)continue;
+        grundy[i] = x;
+        for(int j = i+i;j <= limit;j += i)
+        {
+            if(grundy[j] == -1)grundy[j] = x;
+        }
+        if(x == 0)x++;
+        x++;
+    }
+    for(;i<=limit;i++)
+    {
+        if(grundy[i] == -1)grundy[i] = x++;
+    }
+}
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -46,14 +76,21 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    cool_sieve();
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int n;
+        cin>>n;
+        vector<int> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+
+        int xor_sum = 0;
+        for(int i=0;i<n;i++)
+        {
+            xor_sum ^= (grundy[(v[i])]);
+        }
+        cout(xor_sum == 0);
     }
-    cout<<i<<endl;
 }

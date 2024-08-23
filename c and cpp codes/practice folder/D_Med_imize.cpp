@@ -34,6 +34,8 @@ using namespace std;
     #include </home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>
 #endif
 
+using namespace std;
+
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
@@ -46,14 +48,33 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int n,k;
+        cin>>n>>k;
+        vector<int> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+
+        int lb = *min_element(all(v));
+        int ub = *max_element(all(v)) + 1;
+        while(ub - lb > 1)
+        {
+            int mid = lb + ub >> 1;
+            vector<int> b = v;
+            for_each(all(b), [&](int &ele){ele = mid > ele;});
+            vector<int> dp(n);
+            for(int i=0;i<n;i++)
+            {
+                if(i%k == 0)
+                    dp[i] = min(i-k>=0?dp[i-k]:INF, b[i]);
+                else
+                    dp[i] = min(i-k>=0?dp[i-k]:INF, dp[i-1] + b[i]);
+            }
+            if(dp.back() < ((n-1)%k + 1 + 1)/2) lb = mid;
+            else ub = mid;
+        }
+        cout<<lb<<endl;
     }
-    cout<<i<<endl;
 }

@@ -46,14 +46,14 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
-    {
-        b = a+b;
-        a = b-a;
-        i++;
-    }
-    cout<<i<<endl;
+    string s;
+    cin>>s;
+    sort(all(s));
+    vector<string> ans;
+    ans.push_back(s);
+    while(next_permutation(all(s)))
+    ans.push_back(s);
+
+    cout<<ans.size()<<endl;
+    for(int i=0;i<ans.size();i++)cout<<ans[i]<<endl;
 }

@@ -40,20 +40,23 @@ using namespace std;
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 #define endl "\n" //comment out for interactive problems
 
+void solve(int n, int start_tower,int tgt_tower, int inter_tower)
+{
+    if(n==0)return;
+    solve(n-1,start_tower,inter_tower,tgt_tower);
+    cout<<start_tower<<" "<<tgt_tower<<endl;
+    solve(n-1, inter_tower,tgt_tower,start_tower);
+}
+
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
-    {
-        b = a+b;
-        a = b-a;
-        i++;
-    }
-    cout<<i<<endl;
+    int n;
+    cin>>n;
+    cout<<(1<<n) - 1<<endl;
+    solve(n,1,3,2);
+
 }

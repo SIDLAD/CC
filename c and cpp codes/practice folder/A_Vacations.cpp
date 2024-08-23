@@ -46,14 +46,19 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int n;
+    cin>>n;
+    vector<int> v(n);
+    for(int i=0;i<n;i++)cin>>v[i];
+
+    vector<vector<int>> dp(n+1,vector<int>(3));
+    for(int i=0;i<3;i++)dp[i][0] = 0;
+
+    for(int i=1;i<=n;i++)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        dp[i][0] = *min_element(all(dp[i-1])) + 1;
+        dp[i][1] = min(dp[i-1][0],dp[i-1][2]);
+        dp[i][2] = min(dp[i-1][0],dp[i-1][1]);
     }
-    cout<<i<<endl;
+    cout<<*min_element(all(dp[n]));
 }

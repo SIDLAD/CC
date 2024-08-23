@@ -34,10 +34,12 @@ using namespace std;
     #include </home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>
 #endif
 
+using namespace std;
+
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
+#define cout(x) x?cout<<"YES"<<endl:cout<<"NO"<<endl
 #define endl "\n" //comment out for interactive problems
 
 int32_t main(){
@@ -46,14 +48,28 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int a,b;
-    a = 1,b = 1;
-    int i = 1;
-    while(b<1e9)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        b = a+b;
-        a = b-a;
-        i++;
+        int a,b;
+        cin>>a>>b;
+
+        int mx = a/2 + 1;
+        int mn = 0;
+        debug(mx,mn);
+        while(mx - mn > 1)
+        {
+            int mid = mx + mn>>1;
+            debug(mid);
+            if(mid + (a-2*mid)*2 >= b)
+            {
+                mn = mid;
+            }
+            else mx = mid;
+        }
+        debug(mx,mn);
+        debug();
+        cout(mn + (a-2*mn) *2 == b);
     }
-    cout<<i<<endl;
 }
