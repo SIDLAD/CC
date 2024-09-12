@@ -40,56 +40,40 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-struct info
+void dfs(int node, int p, vector<vector<int>>& edges, vector<array<int,3>>& dp, vector<int>& a,int max_rounds)
 {
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
+    vector<int> round_reports(max_rounds);
+    for(auto child: edges[node])if(child != p)
     {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
+        dfs(child,node,edges,dp,a,max_rounds);
+    }
+
+    for(int i=0;i<max_rounds;i++)
+    {
+        round_reports[i] = (i+1) * a[node];
+        for(auto child:edges[node])if(child!=p)
         {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
+            if(dp[child][1] == i)round_reports[i] += dp[child][2];
+            else round_reports[i] += dp[child][0];
         }
     }
 
-    delete &b;
-    return a;
-}
-
-info& create(int clr)
-{
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
+    array<int,3> ans = {INF,-1,INF};
+    for(int i=0;i<max_rounds;i++)
     {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
+        if(ans[0] > round_reports[i])
+        {
+            ans[2] = ans[0];
+            ans[0] = round_reports[i];
+            ans[1] = i;
+        }
+        else
+        {
+            ans[2] = min(ans[2],round_reports[i]);
+        }
     }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
+    dp[node] = ans;
+}
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -97,23 +81,25 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        int a,b;
-        cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
+        int n;
+        cin>>n;
+        vector<int> a(n);
+        for(int i=0;i<n;i++)cin>>a[i];
+        vector<vector<int>> edges(n);
+        for(int i=0;i<n-1;i++)
+        {
+            int a,b;
+            cin>>a>>b;
+            edges[--a].push_back(--b);
+            edges[b].push_back(a);
+        }
+        int max_rounds = (int)log2(n) + 1;
+        vector<array<int,3>> dp(n);
+        dfs(0,-1,edges,dp,a,max_rounds);
+        cout<<dp[0][0]<<endl;
     }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
-    {
-        cout<<ans[i]<<" ";
-    }
-    cout<<endl;
 }

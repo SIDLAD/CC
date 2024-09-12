@@ -40,80 +40,43 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-struct info
-{
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
-    {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
-    }
-
-    delete &b;
-    return a;
-}
-
-info& create(int clr)
-{
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
-    {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
-    }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        int a,b;
-        cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
+        int m,x;
+        cin>>m>>x;
+        vector<int> v(m);
+        for(auto& x:v)cin>>x;
+
+        priority_queue<int> pq;
+        int ans = 0;
+        int bank = 0;
+        for(int i=0;i<m;i++)
+        {
+            if(bank < v[i])
+            {
+                if(pq.size() and pq.top() > v[i])
+                {
+                    bank += pq.top() - v[i];
+                    pq.pop();
+                    pq.push(v[i]);
+                }
+            }
+            else
+            {
+                bank -= v[i];
+                ans ++;
+                pq.push(v[i]);
+            }
+            bank += x;
+        }
+        cout<<ans<<endl;
     }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
-    {
-        cout<<ans[i]<<" ";
-    }
-    cout<<endl;
 }

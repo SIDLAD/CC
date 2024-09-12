@@ -40,57 +40,6 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-struct info
-{
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
-    {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
-    }
-
-    delete &b;
-    return a;
-}
-
-info& create(int clr)
-{
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
-    {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
-    }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
@@ -99,21 +48,26 @@ int32_t main(){
     // freopen("output.txt","w",stdout);
     int n;
     cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    vector<int>v(n);
+    for(int i=0;i<n;i++)cin>>v[i];
+    sort(all(v));
+    int x = accumulate(all(v),0ll);
+    vector<vector<int>> dp(n + 2,vector<int>(x+1));
+    // dp[0][0] = 1;
+    dp[1][0] = 1;
+    for(int i=1;i<=n;i++)
     {
-        int a,b;
-        cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
+        for(int j=0;j+v[i-1]<=x;j++)
+        {
+            dp[i+1][j] |= dp[i][j];
+            dp[i+1][j+v[i-1]] |= dp[i][j];
+        }
     }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
+    vector<int> ans;
+    for(int i=1;i<=x;i++)if(dp[n+1][i])ans.push_back(debug(i));
+    cout<<ans.size()<<endl;
+    for(int i=0;i<ans.size();i++)
     {
         cout<<ans[i]<<" ";
     }
-    cout<<endl;
 }

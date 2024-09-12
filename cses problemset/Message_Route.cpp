@@ -40,80 +40,48 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-struct info
-{
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
-    {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
-    }
-
-    delete &b;
-    return a;
-}
-
-info& create(int clr)
-{
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
-    {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
-    }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
+    int n,m;
+    cin>>n>>m;
     vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    for(int i=0;i<m;i++)
     {
         int a,b;
         cin>>a>>b;
         edges[--a].push_back(--b);
         edges[b].push_back(a);
     }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
+
+    queue<int> q;
+    q.push(0);
+    vector<int> dist(n,INF);
+    vector<int> p(n,-1);
+    dist[0] = 0;
+    while(q.size())
     {
-        cout<<ans[i]<<" ";
+        int x = q.front();
+        q.pop();
+        for(auto nb:edges[x])if(dist[nb] == INF)
+        {
+            dist[nb] = dist[x] + 1;
+            p[nb] = x;
+            q.push(nb);
+        }
     }
-    cout<<endl;
+    if(dist[n-1] == INF){cout<<"IMPOSSIBLE";return 0;}
+    else cout<<dist[n-1] + 1<<endl;
+    stack<int> s;
+    s.push(n-1);
+    while(p[s.top()] != -1)s.push(p[s.top()]);
+    while(s.size())
+    {
+        cout<<s.top() + 1<<" ";
+        s.pop();
+    }
+
 }

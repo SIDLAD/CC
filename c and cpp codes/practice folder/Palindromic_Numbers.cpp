@@ -39,57 +39,42 @@ using namespace std;
 #define all(x) (x).begin(),(x).end()
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
-
-struct info
+int dp[18][2];
+int calculate(int dig, int under, string a)
 {
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
+    if(dp[dig][under] != -1)return dp[dig][under];
+    if(dig == (a.size() +1)/2)return 1;
+    int upper = under?a[dig] - '0':10;
+    int ans = 0;
+    for(int i=(dig==0);i<=min(9ll,upper);i++)
     {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
+        ans += calculate(dig+1,upper==i,a);
     }
-
-    delete &b;
-    return a;
+    return dp[dig][under] = ans;
 }
 
-info& create(int clr)
+int calculate(string a)
 {
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
+    if(a == "-1")return calculate("0") - 1;
+    string tmp = a.substr(0,(a.size() + 1)>>1);
+    for(int i = tmp.size() - 1 - (a.size()&1);i>=0;i--)
+    tmp.push_back(tmp[i]);
+    int ans = 0;
 
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
+    string x = "";
+    for(int i=1;i<a.size();i++)
     {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
+        x.push_back(9+'0');
+        memset(dp,-1,sizeof(dp));
+        ans += (calculate(0,1,x));
     }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
+    memset(dp,-1,sizeof(dp));
+    ans += (calculate(0,1,a));
+    if((a < (tmp)))ans--;
+    cerr<<endl;
+
+    return ans;
+}
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -97,23 +82,15 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    int T;
+    cin>>T;
+    int TT = 1;
+    for(;T--;TT ++)
     {
         int a,b;
         cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
+        if(a > b)swap(a,b);
+        cout<<"Case "<<TT<<": ";
+        cout<<(calculate(to_string(b))) - (calculate(to_string(a-1)))<<endl;
     }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
-    {
-        cout<<ans[i]<<" ";
-    }
-    cout<<endl;
 }

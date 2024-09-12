@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 const long double EPS = 1e-7;
 const long long int INF = LONG_LONG_MAX/2;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
@@ -39,57 +39,35 @@ using namespace std;
 #define all(x) (x).begin(),(x).end()
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
-
-struct info
+int countererer = 0;
+pair<int,int> calculate(int dig, int eq, pair<int,int> dp[][2], string& a)
 {
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
+    if(dp[dig][eq]!=make_pair(-1ll,-1ll))return dp[dig][eq];
+    if(dig ==a.size())return {0,1};
+    int diglim = 10;
+    if(eq)diglim = a[dig] - '0';
+    pair<int,int> ans = {0,0};
+    for(int i=0;i<10 and i <= diglim;i++)
     {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
+        auto x = calculate(dig+1,i==diglim,dp,a);
+        // debug(i,diglim,dig+1,i==diglim,x,a.size());
+        ans.second += x.second;
+        ans.first += x.first + x.second * i;
     }
-
-    delete &b;
-    return a;
+    countererer++;
+    // debug(dig,eq,ans);
+    return dp[dig][eq] = ans;
 }
 
-info& create(int clr)
+int calculate(int a)
 {
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
+    if(a<=0)return 0;
+    int adigitc = (int)log10(a) + 1;
+    pair<int,int> dp[adigitc+1][2];
+    for(int i=0;i<=adigitc;i++)for(int j=0;j<2;j++)dp[i][j] = {-1,-1};
+    string s = to_string(a);
+    return calculate(0ll, 1ll, dp, s).first;
 }
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
-    {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
-    }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -97,23 +75,13 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
         int a,b;
         cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
+        cout<<calculate(b) - calculate(a-1)<<endl;
+        debug(countererer);
     }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
-    {
-        cout<<ans[i]<<" ";
-    }
-    cout<<endl;
 }

@@ -40,56 +40,24 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-struct info
-{
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
+vector<vector<pair<int,int>>> dp(5000,vector<pair<int,int>>(5000,{-1,-1}));
+vector<int> v(5000);
 
-info& merge(info& a,info& b)
+pair<int,int> solve (int i, int j)
 {
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
+    if(dp[i][j].first != -1)return dp[i][j];
+    if(i == j)
     {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
+        return dp[i][j] = {v[i],0};
     }
 
-    delete &b;
-    return a;
+    auto left = solve(i+1,j);
+    auto right = solve(i,j-1);
+    pair<int,int> ans = {left.second + v[i],left.first};
+    ans = max(ans, make_pair(right.second + v[j] , right.first));
+    return dp[i][j]=  ans;
 }
 
-info& create(int clr)
-{
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
-    {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
-    }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -99,21 +67,7 @@ int32_t main(){
     // freopen("output.txt","w",stdout);
     int n;
     cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
-    {
-        int a,b;
-        cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
-    }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
-    for(int i=0;i<n;i++)
-    {
-        cout<<ans[i]<<" ";
-    }
-    cout<<endl;
+    for(int i=0;i<n;i++)cin>>v[i];
+    
+    cout<<solve(0,n-1).first<<endl;
 }

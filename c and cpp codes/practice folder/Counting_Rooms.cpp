@@ -40,80 +40,35 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-struct info
-{
-    int sum;
-    int mxcnt;
-    map<int,int> clrcnt;
-};
-
-info& merge(info& a,info& b)
-{
-    if(a.clrcnt.size() < b.clrcnt.size())swap(a,b);
-    for(auto [clr,cnt]:b.clrcnt)
-    {
-        a.clrcnt[clr] += cnt;
-        if(a.clrcnt[clr] > a.mxcnt)
-        {
-            a.sum = clr;
-            a.mxcnt = a.clrcnt[clr];
-        }
-        else if(a.clrcnt[clr] == a.mxcnt)
-        {
-            a.sum += clr;
-        }
-    }
-
-    delete &b;
-    return a;
-}
-
-info& create(int clr)
-{
-    info& node = *new info;
-    node.clrcnt[clr]++;
-    node.mxcnt = 1;
-    node.sum = clr;
-    return node;
-}
-
-info& dfs(int node, int p, vector<int>& ans, vector<int>& ori_colors,vector<vector<int>>& edges)
-{
-    stack<info*> s;
-    s.push(&create(ori_colors[node]));
-    for(auto child: edges[node])if(child!=p)
-    {
-        info& cur = *s.top();
-        s.pop();
-        s.push(&merge(cur, dfs(child,node, ans, ori_colors, edges)));
-    }
-    ans[node] = s.top()->sum;
-    return *s.top();
-};
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    vector<int> c(n);
-    for(int i=0;i<n;i++)cin>>c[i];
-    vector<vector<int>> edges(n);
-    for(int i=0;i<n-1;i++)
+    int n,m;
+    cin>>n>>m;
+    vector<vector<char>> v(n,vector<char>(m));
+    for(int i=0;i<n;i++)for(int j=0;j<m;j++)cin>>v[i][j];
+    int ans = 0;
+
+
+    auto dfs = [&](auto self, int i, int j)->void
     {
-        int a,b;
-        cin>>a>>b;
-        edges[--a].push_back(--b);
-        edges[b].push_back(a);
-    }
-    vector<int> ans(n);
-    delete& dfs(0,-1,ans,c,edges);
+        v[i][j] = '$';
+        if(i!=0 and v[i-1][j] == '.')self(self,i-1,j);
+        if(i!=n-1 and v[i+1][j] == '.')self(self,i+1,j);
+        if(j!=0 and v[i][j-1] == '.')self(self,i,j-1);
+        if(j!=m-1 and v[i][j+1] == '.')self(self,i,j+1);
+    };
+
     for(int i=0;i<n;i++)
     {
-        cout<<ans[i]<<" ";
+        for(int j=0;j<m;j++)
+        {
+            if(v[i][j] == '.')ans++,dfs(dfs,i,j);
+
+        }
     }
-    cout<<endl;
+    cout<<ans<<endl;
 }
