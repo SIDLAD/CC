@@ -1,64 +1,30 @@
 #include <bits/stdc++.h>
-const long double EPS = 1e-7;
-const long long int INF = LONG_LONG_MAX/2;
-const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
-//insert policy here
 
-//insert mintcode here
-
-#if defined (ONLINE_JUDGE) || !__has_include (</home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>)
-    void _exe() {}
-    template <typename T, typename... V>
-    const T& _exe(const T &t,const V&... v) {return t;}
-    template <typename T, typename... V>
-    T& _exe(T &t,V&... v) {return t;}
-    
-    #define debug(x...) (_exe(x))
-    
-    class CNothing {};
-
-    template <typename T>
-    const CNothing& operator<<(const CNothing& proxy, const T&)
-    {
-        return proxy;
-    }
-
-    const CNothing& operator<<(const CNothing& proxy, std::ostream& (*)(std::ostream&))
-    {
-        return proxy;
-    }
-    CNothing cnothing;
-    #define cerr cnothing
-#else
-    #include </home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>
-#endif
-
-#define int long long
-#define double long double
-#define all(x) (x).begin(),(x).end()
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
-#define endl "\n" //comment out for interactive problems
-
+int n;
+int v[101];
+int dp[101][3];
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
-    // freopen("input.txt","r",stdin);
-    // freopen("output.txt","w",stdout);
-    int n;
+    
     cin>>n;
-    vector<int> v(n);
     for(int i=0;i<n;i++)cin>>v[i];
 
-    vector<vector<int>> dp(n+1,vector<int>(3));
-    for(int i=0;i<3;i++)dp[i][0] = 0;
+    dp[1][0] = 1;
+    if(v[0]&1)dp[1][1] = 0;
+    else dp[1][1] = 101;
+    if(v[0]&2)dp[1][2] = 0;
+    else dp[1][2] = 101;
 
-    for(int i=1;i<=n;i++)
+    for(int i=2;i<=n;i++)
     {
-        dp[i][0] = *min_element(all(dp[i-1])) + 1;
-        dp[i][1] = min(dp[i-1][0],dp[i-1][2]);
-        dp[i][2] = min(dp[i-1][0],dp[i-1][1]);
+        dp[i][0] = min({dp[i-1][0],dp[i-1][1],dp[i-1][2]}) + 1;
+        if(v[i-1]&1)dp[i][1] = min({dp[i-1][0], dp[i-1][2]});
+        else dp[i][1] = 101;
+        if(v[i-1]&2)dp[i][2] = min({dp[i-1][0], dp[i-1][1]});
+        else dp[i][2] = 101;
     }
-    cout<<*min_element(all(dp[n]));
+    cout<<min({dp[n][0],dp[n][1],dp[n][2]});
 }
