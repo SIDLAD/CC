@@ -36,7 +36,7 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
+#define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
 const int INF =
@@ -47,53 +47,51 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
+int n,m;
+vector<vector<pair<int,int>>> edges;
+vector<forward_list<int>::iterator> iterind;
 
-void answer(int a)
+signed main()
 {
-    a++;
-    cout<<"! "<<a<<endl;
-}
-
-int32_t main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL); cout.tie(NULL);
-    cout.precision(numeric_limits<double>::max_digits10);
-    // freopen("input.txt","r",stdin);
-    // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    cin>>n>>m;
+    edges.resize(n);
+    vector<int> ind(n),outd(n);
+    for(int i=0;i<m;i++)
     {
-        int n;
-        cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
-        {
-            if(ask(i,i+1)!=ask(i+1,i))
-            {
-                imppair = i;
-                break;
-            }
-        }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
-
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
-        {
-            answer(imppair);
-        }
-        else answer(imppair+1);
+        int a,b;
+        cin>>a>>b;
+        a--,b--;
+        edges[a].push_back({b,i});
+        outd[a]++,ind[b]++;
     }
+    vector<int> mark(n);
+    for(int i=0;i<n;i++)
+    {
+        if(ind[i] + (i==0) != outd[i] + (i == n-1)){cout<<"IMPOSSIBLE"<<endl;return 0;}
+        else if(!edges[i].size())mark[i] = 1;
+    }
+    vector<int> seen(m);
+    vector<int> revans;
+    auto dfs = [&](auto self, int node)->void
+    {
+        mark[node] = 1;
+        while(edges[node].size())
+        {
+            auto [next,id] = edges[node].back();
+            edges[node].pop_back();
+            if(seen[id])continue;
+            seen[id] = 1;
+            self(self,next);
+        }
+        revans.push_back(node);
+    };
+    dfs(dfs,0);
+    debug(revans);
+    if(*min_element(all(mark)) == 0)
+    {
+        cout<<"IMPOSSIBLE"<<endl;
+        return 0;
+    }
+    reverse(all(revans));
+    for(int ele:revans)cout<<ele+1<<" ";
 }

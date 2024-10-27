@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-const long double EPS = 1e-7;
+const long double EPS = 1e-11;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
 //insert policy here
@@ -36,7 +36,7 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
+#define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
 const int INF =
@@ -47,21 +47,22 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
+bool comp(pair<int,int> p1,pair<int,int> p2) // p1 >= p2 ?
 {
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
+    if(p1.first == 1)return p2.first == 1;
+    if(p2.first == 1)return 0;
+    double llhs = p1.second + log2l(log2l(p1.first));
+    double rrhs = p2.second + log2l(log2l(p2.first));
+    return llhs >= rrhs;
 }
 
-void answer(int a)
+int incrementreq(pair<int,int> p1,const pair<int,int> p2)
 {
-    a++;
-    cout<<"! "<<a<<endl;
+    double llhs = p1.second;
+    double rrhs = p2.second + log2l(log2l(p2.first)) - log2l(log2l(p1.first));
+    return max(0ll,(int)(ceill(rrhs - llhs - EPS)));
 }
+
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -69,31 +70,34 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    int T;
+    cin>>T;
+    int TT = 1;
+    for(;T--;TT++)
     {
         int n;
         cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
+        vector<int> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+        vector<pair<int,int>> b(n);
+        for(int i=0;i<n;i++)b[i] = {v[i],0};
+        int cnt = 0;
+        for(int i=1;i<n;i++)
         {
-            if(ask(i,i+1)!=ask(i+1,i))
+            if(comp(b[i],b[i-1]))continue;
+            if(v[i] == 1)
             {
-                imppair = i;
-                break;
+                cout<<-1<<endl;
+                goto end;
             }
-        }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
+            if(v[i-1] == 1)continue;
+            int tmp = incrementreq(b[i],b[i-1]);
+            assert(tmp != 0);
+            cnt += tmp;
+            b[i].second += tmp;
         }
 
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
-        {
-            answer(imppair);
-        }
-        else answer(imppair+1);
+        cout<<cnt<<endl;
+        end:42;
     }
 }

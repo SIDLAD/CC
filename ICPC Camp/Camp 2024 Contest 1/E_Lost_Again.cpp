@@ -3,9 +3,10 @@ const long double EPS = 1e-7;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
 //insert policy here
-int MOD;
+
 
 #define MINT_MACRO
+template<int MOD = M>
 struct Mint {
     int val;
     Mint(long long v = 0) { if (v < 0) v = v % MOD + MOD; if (v >= MOD) v %= MOD; val = v; }
@@ -18,7 +19,7 @@ struct Mint {
     explicit operator bool()const { return val; }
     Mint& operator+=(const Mint &o) { val += o.val; if (val >= MOD) val -= MOD; return *this; }
     Mint& operator-=(const Mint &o) { val -= o.val; if (val < 0) val += MOD; return *this; }
-    unsigned fast_mod(uint64_t x, unsigned m = MOD) {
+    static unsigned fast_mod(uint64_t x, unsigned m = MOD) {
            #if !defined(_WIN32) || defined(_WIN64)
                 return x % m;
            #endif
@@ -50,8 +51,7 @@ struct Mint {
     friend istream& operator >> (istream &stream, Mint &m) { return stream>>m.val; } 
 };
 
-using mint = Mint;
-
+using mint = Mint<>;
 
 #if defined (ONLINE_JUDGE) || !__has_include (</home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>)
     void _exe() {}
@@ -93,26 +93,6 @@ const int INF =
     INT_MAX/2
 #endif
 ;
-vector<mint> zval,zminus1invval;
-
-mint solve(int h, int t, map<pair<int,int>,mint>& mp)
-{
-    if(h == 1)return 1;
-    if(mp.find({h,t}) != mp.end())
-    {
-        return mp[{h,t}];
-    }
-    mint ans = 0;
-    mint z = zval[h-1];
-    mint zminus1inv = zminus1invval[h-1];
-    for(int j=1;j<=t;j++)
-    {
-        int rem = min(t-j,j-1);
-        mint mult = h == 2? rem + 1: (z[rem + 1] - 1) * zminus1inv;
-        ans += solve(h-1,j,mp) * 2 * mult;
-    }
-    return mp[{h,t}] = ans;
-}
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -120,26 +100,46 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int T;
-    cin>>T;
-    for(;T--;)
+    int n;
+    cin>>n;
+    vector<vector<int>> edges(n);
+    for(int i=0;i<n-1;i++)
     {
-        int n,k,p;
-        cin>>n>>k>>p;
-        map<pair<int,int>,mint> mp;
-        MOD = p;
-
-        zval.clear();
-        zval.resize(n + 1);
-        zval[0] = 1;
-        for(int i=1;i<=n;i++)zval[i] = zval[i-1] * 2;
-        for(int i=0;i<=n;i++)zval[i]--;
-
-        zminus1invval.clear(),zminus1invval.resize(n + 1);
-        for(int i=0;i<=n;i++)
-        {
-            zminus1invval[i] = (zval[i] - 1).inv();
-        }
-        cout<<solve(n,k,mp)<<endl;
+        int a,b;
+        cin>>a>>b;
+        edges[--a].push_back(--b);
+        edges[b].push_back(a);
     }
+    debug(edges);
+
+    vector<int> subanswer(n),subsize(n,1);
+    
+    auto dfs1 = [&](auto self, int node =0, int p = -1)->void
+    {
+        for(auto nbr:edges[node])if(nbr != p)
+        {
+            self(self,nbr,node);
+            subsize[node] += subsize[nbr];
+            subanswer[node] += subanswer[nbr] + subsize[nbr];
+        }
+    };
+    dfs1(dfs1);
+    debug(subanswer,subsize);
+    vector<int> answer(n);
+    auto dfs2 = [&](auto self, int node=0, int p = -1)->void
+    {
+        if(node == 0)answer[node] = subanswer[node];
+        else
+        {
+            answer[node] = (answer[p] - subsize[node]) + (n) - subsize[node] ;
+        }
+        for(auto nbr:edges[node])if(nbr!=p)self(self,nbr,node);
+    };
+
+    dfs2(dfs2);
+    debug(answer);
+    mint sum = 0;
+    for(int i=0;i<n;i++)sum += answer[i];
+    sum /= (n * n + n);
+    cout<<sum<<endl;
 }

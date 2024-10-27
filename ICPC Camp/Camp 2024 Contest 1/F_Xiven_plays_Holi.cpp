@@ -3,9 +3,10 @@ const long double EPS = 1e-7;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
 //insert policy here
-int MOD;
+
 
 #define MINT_MACRO
+template<int MOD = M>
 struct Mint {
     int val;
     Mint(long long v = 0) { if (v < 0) v = v % MOD + MOD; if (v >= MOD) v %= MOD; val = v; }
@@ -18,7 +19,7 @@ struct Mint {
     explicit operator bool()const { return val; }
     Mint& operator+=(const Mint &o) { val += o.val; if (val >= MOD) val -= MOD; return *this; }
     Mint& operator-=(const Mint &o) { val -= o.val; if (val < 0) val += MOD; return *this; }
-    unsigned fast_mod(uint64_t x, unsigned m = MOD) {
+    static unsigned fast_mod(uint64_t x, unsigned m = MOD) {
            #if !defined(_WIN32) || defined(_WIN64)
                 return x % m;
            #endif
@@ -50,8 +51,7 @@ struct Mint {
     friend istream& operator >> (istream &stream, Mint &m) { return stream>>m.val; } 
 };
 
-using mint = Mint;
-
+using mint = Mint<>;
 
 #if defined (ONLINE_JUDGE) || !__has_include (</home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>)
     void _exe() {}
@@ -93,25 +93,29 @@ const int INF =
     INT_MAX/2
 #endif
 ;
-vector<mint> zval,zminus1invval;
 
-mint solve(int h, int t, map<pair<int,int>,mint>& mp)
+mint fact(int n)
 {
-    if(h == 1)return 1;
-    if(mp.find({h,t}) != mp.end())
+    static mint answer[21] = {};
+    if(answer[0] == 0)
     {
-        return mp[{h,t}];
+        answer[0] = 1;
+        for(int i=1;i<=20;i++)
+        {
+            answer[i] = answer[i-1] * i;
+        }
     }
-    mint ans = 0;
-    mint z = zval[h-1];
-    mint zminus1inv = zminus1invval[h-1];
-    for(int j=1;j<=t;j++)
+    return answer[n];
+}
+
+mint factinv(int n)
+{
+    static mint answer[21] = {};
+    if(answer[0] == 0)
     {
-        int rem = min(t-j,j-1);
-        mint mult = h == 2? rem + 1: (z[rem + 1] - 1) * zminus1inv;
-        ans += solve(h-1,j,mp) * 2 * mult;
+        for(int i=0;i<=20;i++)answer[i] = fact(i).inv();
     }
-    return mp[{h,t}] = ans;
+    return answer[n];
 }
 
 int32_t main(){
@@ -120,26 +124,13 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int T;
-    cin>>T;
-    for(;T--;)
+    int n;
+    cin>>n;
+    mint ans = 0;
+    for(int i=0;i<=n;i++)
     {
-        int n,k,p;
-        cin>>n>>k>>p;
-        map<pair<int,int>,mint> mp;
-        MOD = p;
-
-        zval.clear();
-        zval.resize(n + 1);
-        zval[0] = 1;
-        for(int i=1;i<=n;i++)zval[i] = zval[i-1] * 2;
-        for(int i=0;i<=n;i++)zval[i]--;
-
-        zminus1invval.clear(),zminus1invval.resize(n + 1);
-        for(int i=0;i<=n;i++)
-        {
-            zminus1invval[i] = (zval[i] - 1).inv();
-        }
-        cout<<solve(n,k,mp)<<endl;
+        ans += (i&1 ? -1 : 1) * fact(n) * factinv(i);
+        debug(ans);
     }
+    cout<<ans<<endl;
 }

@@ -3,9 +3,10 @@ const long double EPS = 1e-7;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
 //insert policy here
-int MOD;
+
 
 #define MINT_MACRO
+template<int MOD = M>
 struct Mint {
     int val;
     Mint(long long v = 0) { if (v < 0) v = v % MOD + MOD; if (v >= MOD) v %= MOD; val = v; }
@@ -18,7 +19,7 @@ struct Mint {
     explicit operator bool()const { return val; }
     Mint& operator+=(const Mint &o) { val += o.val; if (val >= MOD) val -= MOD; return *this; }
     Mint& operator-=(const Mint &o) { val -= o.val; if (val < 0) val += MOD; return *this; }
-    unsigned fast_mod(uint64_t x, unsigned m = MOD) {
+    static unsigned fast_mod(uint64_t x, unsigned m = MOD) {
            #if !defined(_WIN32) || defined(_WIN64)
                 return x % m;
            #endif
@@ -50,8 +51,7 @@ struct Mint {
     friend istream& operator >> (istream &stream, Mint &m) { return stream>>m.val; } 
 };
 
-using mint = Mint;
-
+using mint = Mint<>;
 
 #if defined (ONLINE_JUDGE) || !__has_include (</home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>)
     void _exe() {}
@@ -93,53 +93,88 @@ const int INF =
     INT_MAX/2
 #endif
 ;
-vector<mint> zval,zminus1invval;
 
-mint solve(int h, int t, map<pair<int,int>,mint>& mp)
-{
-    if(h == 1)return 1;
-    if(mp.find({h,t}) != mp.end())
-    {
-        return mp[{h,t}];
-    }
-    mint ans = 0;
-    mint z = zval[h-1];
-    mint zminus1inv = zminus1invval[h-1];
-    for(int j=1;j<=t;j++)
-    {
-        int rem = min(t-j,j-1);
-        mint mult = h == 2? rem + 1: (z[rem + 1] - 1) * zminus1inv;
-        ans += solve(h-1,j,mp) * 2 * mult;
-    }
-    return mp[{h,t}] = ans;
-}
+int n,m,k;
 
+vector<vector<int>> nbrs = {
+        {4,6}, // 0
+        {6,8}, // 1
+        {7,9}, // 2
+        {4,8}, // 3
+        {3,9,0}, // 4
+        {},    // 5
+        {1,7,0}, // 6
+        {2,6}, // 7
+        {1,3}, // 8
+        {2,4}, // 9
+};
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int T;
-    cin>>T;
-    for(;T--;)
+    debug(nbrs.size());
+    cin>>n>>m>>k;
+    string s;
+    cin>>s;
+    if(m == 0){s = '0' + 10;m = 1;}
+    vector<int> zval(m);
+    int l = 0,r = 0;
+    for(int i=1;i<m;i++)
     {
-        int n,k,p;
-        cin>>n>>k>>p;
-        map<pair<int,int>,mint> mp;
-        MOD = p;
-
-        zval.clear();
-        zval.resize(n + 1);
-        zval[0] = 1;
-        for(int i=1;i<=n;i++)zval[i] = zval[i-1] * 2;
-        for(int i=0;i<=n;i++)zval[i]--;
-
-        zminus1invval.clear(),zminus1invval.resize(n + 1);
-        for(int i=0;i<=n;i++)
+        if(r > i)zval[i] = min(r - i,zval[i-l]);
+        while(i + zval[i] < m and s[zval[i] + i] == s[i])zval[i]++;
+        if(zval[i] + i > r)
         {
-            zminus1invval[i] = (zval[i] - 1).inv();
+            r = zval[i] + i;
+            l = i;
         }
-        cout<<solve(n,k,mp)<<endl;
     }
+
+    // mint dp[n + 1][10][m] = {};
+    vector<vector<vector<mint>>> dp(n + 1,vector<vector<mint>>(10,vector<mint>(m)));
+    dp[0][k][0] = 1;
+
+    int mnextfetch[m][10] = {};
+    auto getmnext = [&](int mprev, int nextdig)
+    {
+        if(nextdig == s[mprev] - '0')return mprev + 1;
+        int mnext = (s[0] - '0' == nextdig);
+        for(int i=1;i<mprev;i++)
+        {
+            if(i + zval[i] == n and s[zval[i]] - '0'== nextdig)
+            {
+                mnext = zval[i] + 1;
+                break;
+            }
+        }
+        return mnext;
+    };
+    for(int i=0;i<m;i++)for(int j=0;j<10;j++)
+    {
+        mnextfetch[i][j] = getmnext(i,j);
+    }
+    
+
+    for(int i=0;i<n;i++)
+    {
+        for(int curdig = 0;curdig <10;curdig++)
+        {
+            for(int mprev = 0;mprev < m; mprev++)
+            {
+                for(auto nextdig: nbrs[curdig])
+                {
+                    int mnext = mnextfetch[mprev][nextdig];
+                    if(mnext == m)continue;
+
+                    dp[i + 1][nextdig][mnext] += dp[i][curdig][mprev];
+                }
+            }
+        }
+    }
+    mint ans = 0;
+    for(int j=0;j<=9;j++)for(int k=0;k<m;k++)
+    ans += dp[n][j][k];
+    cout<<ans<<endl;
 }

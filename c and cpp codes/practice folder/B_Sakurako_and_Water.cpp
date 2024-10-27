@@ -36,8 +36,8 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
+#define endl "\n" //comment out for interactive problems
+#define cout(x) x?cout<<"YES"<<endl:cout<<"NO"<<endl
 
 const int INF =
 #ifdef int
@@ -47,53 +47,41 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
-}
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
         int n;
         cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
+        vector<vector<int>> a(n,vector<int>(n));
+        for(int i=0;i<n;i++)for(int j=0;j<n;j++)cin>>a[i][j];
+        int totcnt = 0;
+        for(int i=0;i<n;i++)
         {
-            if(ask(i,i+1)!=ask(i+1,i))
+            int mn = 0;
+            for(int j=0;j+i<n;j++)
             {
-                imppair = i;
-                break;
+                int k = j + i;
+                mn = min(mn,a[j][k]);
             }
+            totcnt -= mn;
         }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
-
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
+        for(int i=1;i<n;i++)
         {
-            answer(imppair);
+            int mn = 0;
+            for(int k=0;k+i<n;k++)
+            {
+                int j = k + i;
+                mn = min(mn,a[j][k]);
+            }
+            totcnt -= mn;
         }
-        else answer(imppair+1);
+        cout<<totcnt<<endl;
     }
 }

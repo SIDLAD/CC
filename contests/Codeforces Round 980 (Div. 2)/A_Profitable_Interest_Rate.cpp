@@ -36,7 +36,7 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
+#define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
 const int INF =
@@ -47,53 +47,24 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
-}
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
-        int n;
-        cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
+        int a,b;
+        cin>>a>>b;
+        if(a>=b)cout<<a<<endl;
+        else
         {
-            if(ask(i,i+1)!=ask(i+1,i))
-            {
-                imppair = i;
-                break;
-            }
+            int l = b-a;
+            if(a <= l)cout<<0<<endl;
+            else cout<<a-l<<endl;
         }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
-
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
-        {
-            answer(imppair);
-        }
-        else answer(imppair+1);
     }
 }

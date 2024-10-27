@@ -36,8 +36,8 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
+#define endl "\n" //comment out for interactive problems
+#define cout(x) x?cout<<"YES"<<endl:cout<<"NO"<<endl
 
 const int INF =
 #ifdef int
@@ -47,53 +47,59 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
-}
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
         int n;
         cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
+        vector<int> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+        int ans = 0;
+        int l =0;
+        for(int i=0;i<=n;i++)
         {
-            if(ask(i,i+1)!=ask(i+1,i))
+            if(i ==n  or v[i] != 1)
             {
-                imppair = i;
-                break;
+                ans += l * (l-1) / 2;
+                l=0;
             }
+            else l++;
         }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
-
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
+        for(int i=0;i<=n;i++)
         {
-            answer(imppair);
+            if(i ==n  or v[i] != 3)
+            {
+                ans += l * (l-1) / 2;
+                l=0;
+            }
+            else l++;
         }
-        else answer(imppair+1);
+        for(int i=0;i<n;i++)if(v[i]!=2)ans++;
+        debug(ans);
+
+        map<int,int> mp;
+        int hill = 0;
+        stack<int> st;
+        st.push(0);
+        for(int i=0;i<n;i++)
+        {
+            debug();
+            debug(v[i]);
+            if(v[i] == 1)hill++;
+            if(v[i] == 3)hill--;
+            if(v[i] == 2){while(st.size())mp[st.top()]++,st.pop();}
+            st.push(hill);
+            debug(hill,mp[hill],i);
+            if(mp[hill])ans += mp[hill],debug(ans);
+        }
+        debug("tt");debug();
+        cout<<ans<<endl;
     }
 }

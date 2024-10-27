@@ -36,7 +36,7 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
+#define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
 const int INF =
@@ -46,22 +46,52 @@ const int INF =
     INT_MAX/2
 #endif
 ;
+int n,m;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
+class DSU {
+public:
+    int n;
+    vector<int> p,sz,rank;
+    int start, count = 0;
+ 
+    DSU(int start,int n) : n(n),start(start) {
+        rank.resize(n+1,1);
+        p.resize(n+1);
+        sz.resize(n+1);
+        for(int i=start;i<=n;i++)
+        {
+            p[i] = i;
+            sz[i] = 1;
+            count++;
+        }
+    }
 
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
-}
+    DSU(int n):DSU(0,n-1){}
+ 
+    int find(int x) {
+        if(x == p[x]) return x;
+        return p[x] = find(p[x]);
+    }
+    int size(int x)
+    {
+        if(x == p[x]) return sz[x];
+        else return sz[p[x] = find(p[x])];
+    }
+ 
+    bool unite(int a, int b) {
+        int c = find(a);
+        int d = find(b);
+        if(d != c) {
+            if(rank[c] < rank[d]) swap(c,d);
+            if(rank[c] == rank[d]) rank[c]++;
+            p[d] = c;
+            sz[c] += sz[d];
+            count--;
+            return true;
+        }
+        return false;
+    }
+};
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -69,31 +99,19 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    cin>>n>>m;
+    vector<array<int,3>> inp(m);
+    for(int i=0;i<m;i++)
     {
-        int n;
-        cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
-        {
-            if(ask(i,i+1)!=ask(i+1,i))
-            {
-                imppair = i;
-                break;
-            }
-        }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
-
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
-        {
-            answer(imppair);
-        }
-        else answer(imppair+1);
+        cin>>inp[i][0]>>inp[i][1]>>inp[i][2];
     }
+    sort(all(inp),[&](auto& a, auto& b)->bool{return a[2] < b[2];});
+    DSU dsu(1,n);
+    int ans = 0;
+    for(int i=0;i<m;i++)
+    {
+        if(dsu.unite(inp[i][0],inp[i][1]))ans += inp[i][2];
+    }
+    if(dsu.count != 1)cout<<"IMPOSSIBLE"<<endl;
+    else cout<<ans<<endl;
 }

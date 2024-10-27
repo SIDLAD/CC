@@ -3,9 +3,10 @@ const long double EPS = 1e-7;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
 //insert policy here
-int MOD;
+
 
 #define MINT_MACRO
+template<int MOD = M>
 struct Mint {
     int val;
     Mint(long long v = 0) { if (v < 0) v = v % MOD + MOD; if (v >= MOD) v %= MOD; val = v; }
@@ -18,7 +19,7 @@ struct Mint {
     explicit operator bool()const { return val; }
     Mint& operator+=(const Mint &o) { val += o.val; if (val >= MOD) val -= MOD; return *this; }
     Mint& operator-=(const Mint &o) { val -= o.val; if (val < 0) val += MOD; return *this; }
-    unsigned fast_mod(uint64_t x, unsigned m = MOD) {
+    static unsigned fast_mod(uint64_t x, unsigned m = MOD) {
            #if !defined(_WIN32) || defined(_WIN64)
                 return x % m;
            #endif
@@ -50,8 +51,7 @@ struct Mint {
     friend istream& operator >> (istream &stream, Mint &m) { return stream>>m.val; } 
 };
 
-using mint = Mint;
-
+using mint = Mint<>;
 
 #if defined (ONLINE_JUDGE) || !__has_include (</home/sidlad/Desktop/Coding Folder/c and cpp codes/Debug.h>)
     void _exe() {}
@@ -93,26 +93,6 @@ const int INF =
     INT_MAX/2
 #endif
 ;
-vector<mint> zval,zminus1invval;
-
-mint solve(int h, int t, map<pair<int,int>,mint>& mp)
-{
-    if(h == 1)return 1;
-    if(mp.find({h,t}) != mp.end())
-    {
-        return mp[{h,t}];
-    }
-    mint ans = 0;
-    mint z = zval[h-1];
-    mint zminus1inv = zminus1invval[h-1];
-    for(int j=1;j<=t;j++)
-    {
-        int rem = min(t-j,j-1);
-        mint mult = h == 2? rem + 1: (z[rem + 1] - 1) * zminus1inv;
-        ans += solve(h-1,j,mp) * 2 * mult;
-    }
-    return mp[{h,t}] = ans;
-}
 
 int32_t main(){
     ios_base::sync_with_stdio(false);
@@ -124,22 +104,47 @@ int32_t main(){
     cin>>T;
     for(;T--;)
     {
-        int n,k,p;
-        cin>>n>>k>>p;
-        map<pair<int,int>,mint> mp;
-        MOD = p;
+        int n;
+        cin>>n;
+        vector<int> a(n),b(n);
+        for(int i=0;i<n;i++)cin>>a[i];
+        for(int i=0;i<n;i++)cin>>b[i],b[i]--;
 
-        zval.clear();
-        zval.resize(n + 1);
-        zval[0] = 1;
-        for(int i=1;i<=n;i++)zval[i] = zval[i-1] * 2;
-        for(int i=0;i<=n;i++)zval[i]--;
-
-        zminus1invval.clear(),zminus1invval.resize(n + 1);
-        for(int i=0;i<=n;i++)
+        vector<vector<pair<int,int>>> edges(n);
+        edges[0].push_back({b[0],a[0]});
+        for(int i=1;i<n;i++)
         {
-            zminus1invval[i] = (zval[i] - 1).inv();
+            edges[i].push_back({i-1,0});
+            edges[i].push_back({b[i],a[i]});
         }
-        cout<<solve(n,k,mp)<<endl;
+
+        vector<int> djikstra(n,INF);
+        djikstra[0] = 0;
+
+        priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> pq;
+        pq.push({0,0});
+        while(pq.size())
+        {
+            auto [loss,node] = pq.top();
+            pq.pop();
+            if(djikstra[node] != loss)continue;
+            for(auto [nbr,wt]:edges[node])
+            {
+                if(djikstra[node] + wt < djikstra[nbr])
+                {
+                    djikstra[nbr] = djikstra[node] + wt;
+                    pq.push({djikstra[nbr],nbr});
+                }
+            }
+        }
+        debug(djikstra);
+        vector<int> pre(n);
+        partial_sum(all(a),pre.begin());
+        int mx = 0;
+        for(int i=0;i<n;i++)
+        {
+            mx = max(mx,-djikstra[i] + pre[i]);
+        }
+        cout<<mx<<endl;
     }
 }

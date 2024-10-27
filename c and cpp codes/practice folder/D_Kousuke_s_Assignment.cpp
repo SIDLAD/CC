@@ -36,8 +36,8 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
+#define endl "\n" //comment out for interactive problems
+#define cout(x) x?cout<<"YES"<<endl:cout<<"NO"<<endl
 
 const int INF =
 #ifdef int
@@ -47,53 +47,34 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
-}
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
         int n;
         cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
+        vector<int> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+        partial_sum(all(v),v.begin());
+        map<int,int> mp;
+        mp[0] = -1;
+        vector<int> dp(n + 1);
+        dp[0] = 0;
+        for(int i=0;i<n;i++)
         {
-            if(ask(i,i+1)!=ask(i+1,i))
+            dp[i + 1] = dp[i];
+            if(mp.count(v[i]))
             {
-                imppair = i;
-                break;
+                dp[i + 1] = max(dp[i + 1], 1 + (dp[mp[v[i]] + 1]));
             }
+            mp[v[i]] = i;
         }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
-
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
-        {
-            answer(imppair);
-        }
-        else answer(imppair+1);
+        cout<<*max_element(all(dp))<<endl;
     }
 }

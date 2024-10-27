@@ -36,7 +36,7 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
+#define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
 const int INF =
@@ -46,21 +46,12 @@ const int INF =
     INT_MAX/2
 #endif
 ;
+int a,b,m;
 
-int ask(int i, int j)
+int solve(int digitcount)
 {
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
+    int an = max(a,(int)powl(10,digitcount - 1));
+    int bn = min(b,(int)powl(10,digitcount) - 1);
 }
 
 int32_t main(){
@@ -69,31 +60,20 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
-    {
-        int n;
-        cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
-        {
-            if(ask(i,i+1)!=ask(i+1,i))
-            {
-                imppair = i;
-                break;
-            }
-        }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
 
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
+    int T;
+    cin>>T;
+    for(int TT = 1;T--;TT++)
+    {
+        cin>>a>>b>>m;
+        int ans = 0;
+        int diga = a == 0?1:log10(a) + 1;
+        int digb = b==0?1:log10(b) + 1;
+        for(int i=diga;i<=digb;i++)
         {
-            answer(imppair);
+            if(~i&1)continue;
+            ans += solve(i);
         }
-        else answer(imppair+1);
+        cout<<"Case #"<<TT<<": "<<ans<<endl;
     }
 }

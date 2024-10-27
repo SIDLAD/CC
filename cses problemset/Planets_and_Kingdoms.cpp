@@ -36,7 +36,7 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
+#define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
 const int INF =
@@ -46,21 +46,23 @@ const int INF =
     INT_MAX/2
 #endif
 ;
+int n,m;
+vector<vector<int>> edges,redges;
+vector<pair<int,int>> tout;
+vector<int> ans;
 
-int ask(int i, int j)
+void dfs(int node, vector<int>& visited, vector<vector<int>>& edges, int& t, int label = -1)
 {
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
+    debug(node);
+    if(visited[node])return;
+    visited[node] = true;
+    ans[node] = label;
+    for(auto nbr: edges[node])if(!visited[nbr])
+    {
+        dfs(nbr,visited,edges,t,label);
+    }
+    if(tout[node-1] == make_pair(0ll,0ll))
+    tout[node-1] = {t++,node};
 }
 
 int32_t main(){
@@ -69,31 +71,28 @@ int32_t main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
-    {
-        int n;
-        cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
-        {
-            if(ask(i,i+1)!=ask(i+1,i))
-            {
-                imppair = i;
-                break;
-            }
-        }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
 
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
-        {
-            answer(imppair);
-        }
-        else answer(imppair+1);
+    cin>>n>>m;
+    edges.resize(n + 1),redges.resize(n + 1),ans.resize(n + 1);
+    tout.resize(n);
+    for(int i=0;i<m;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        edges[a].push_back(b),redges[b].push_back(a);
     }
+
+    vector<int> visited(n + 1);
+    int t=0;
+    for(int i=1;i<=n;i++)dfs(i,visited,edges,t);
+    sort(all(tout)),reverse(all(tout));
+    debug(tout);
+    visited.assign(n + 1, 0);
+    int cnt = 0;
+    for(int i=0;i<n;i++)if(!visited[tout[i].second])
+    {
+        dfs(tout[i].second,visited,redges,t,++cnt);
+    }
+    cout<<cnt<<endl;
+    for(int i=1;i<=n;i++)cout<<ans[i]<<" ";
 }

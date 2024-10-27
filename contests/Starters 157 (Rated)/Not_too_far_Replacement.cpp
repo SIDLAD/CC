@@ -36,8 +36,8 @@ using namespace std;
 #define int long long
 #define double long double
 #define all(x) (x).begin(),(x).end()
-// #define endl "\n" //comment out for interactive problems
-#define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
+#define endl "\n" //comment out for interactive problems
+#define cout(x) x?cout<<"YES"<<endl:cout<<"NO"<<endl
 
 const int INF =
 #ifdef int
@@ -47,53 +47,43 @@ const int INF =
 #endif
 ;
 
-int ask(int i, int j)
-{
-    assert(i!=j);
-    i++,j++;
-    cout<<"? "<<i<<" "<<j<<endl;
-    int x;
-    cin>>x;
-    return x;
-}
-
-void answer(int a)
-{
-    a++;
-    cout<<"! "<<a<<endl;
-}
-
 int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int t;
-    cin>>t;
-    while(t--)
+    int T;
+    cin>>T;
+    for(;T--;)
     {
         int n;
         cin>>n;
-        int imppair = ((n+1)&-2)-2;
-        for(int i=0;i<((n+1)&-2)-2;i+=2)
+        multiset<int> st;
+        for(int i=0;i<n;i++)
         {
-            if(ask(i,i+1)!=ask(i+1,i))
-            {
-                imppair = i;
-                break;
-            }
+            int x;
+            cin>>x;
+            st.insert(x);
         }
-        if(imppair == ((n+1)&-2)-2 and n&1){
-            answer(n-1);
-            continue;
-        }
+        int tmp;
+        cin>>tmp;
 
-        int prev = (imppair-1 + n)%n;
-        if(ask(imppair,prev)!=ask(prev,imppair))
+        while(true)
         {
-            answer(imppair);
+            auto it1 = st.upper_bound(tmp);
+            auto it2 = st.upper_bound(2*tmp);
+            if(it2 == st.begin())break;
+            if(it1 == st.end())break;
+            it2--;
+            if(*it1 > *it2)break;
+            debug(*it1,*it2,st,tmp);
+            int x = *it2;
+            st.erase(it2);
+            st.insert(tmp);
+            tmp = x;
         }
-        else answer(imppair+1);
+        debug(accumulate(all(st),0ll));
+        cout<<accumulate(all(st),0ll)<<endl;
     }
 }
