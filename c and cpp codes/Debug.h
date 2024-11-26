@@ -4,7 +4,7 @@
 using namespace std;
 
 #ifdef MINT_MACRO
-template<int MOD = M>
+template<int MOD>
 void __print(Mint<MOD> x) {cerr << x;}
 #endif
 void __print(int x) {cerr << x;}
