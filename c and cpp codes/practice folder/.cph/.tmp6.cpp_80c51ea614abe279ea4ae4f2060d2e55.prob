@@ -1,0 +1,1 @@
+{"name":"Local: tmp6","url":"/home/sidlad/Coding Folder/c and cpp codes/practice folder/tmp6.cpp","tests":[{"id":1734805174644,"input":"5 3\n3 7 2 2 5\n? 2 3\n! 3 6\n? 2 3","output":"3\n2"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"/home/sidlad/Coding Folder/c and cpp codes/practice folder/tmp6.cpp","group":"local","local":true}

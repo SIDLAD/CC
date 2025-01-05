@@ -75,8 +75,8 @@ int32_t main(){
     {
         int n;
         cin>>n;
-        int imppair = -1;
-        for(int i=0;i<n-1;i+=2)
+        int imppair = ((n+1)&-2)-2;
+        for(int i=0;i<((n+1)&-2)-2;i+=2)
         {
             if(ask(i,i+1)!=ask(i+1,i))
             {
@@ -84,7 +84,7 @@ int32_t main(){
                 break;
             }
         }
-        if(imppair == -1){
+        if(imppair == ((n+1)&-2)-2 and n&1){
             answer(n-1);
             continue;
         }

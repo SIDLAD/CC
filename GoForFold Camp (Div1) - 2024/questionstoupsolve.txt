@@ -1,0 +1,18 @@
+Contest 4:
+----------
+C. Multiple?
+I. Trade
+J. Increasing or Decreasing
+A. Assignment Problem ||
+E. Smol Vertex Cover
+(Vertex Cover is NP Hard, but..)
+(Blossom algorithm in n^3)
+B. Lockout vs Tourist
+L. Extreme Wealth
+(Stirling second order approximation)
+H. Excluded Min ||
+
+
+
+----Last Contest--
+New year and castle construction (1284E)
