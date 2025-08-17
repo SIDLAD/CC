@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 const long double EPS = 1e-7;
-const long long int INF = LONG_LONG_MAX/2;
+const long long int INF = LLONG_MAX/2;
 const long long int M = (long long int) 1e9 + 7;//998'244'353;
 using namespace std;
 //insert policy here
@@ -40,22 +40,20 @@ using namespace std;
 #define endl "\n" //comment out for interactive problems
 #define cout(x) x?cout<<"Yes"<<endl:cout<<"No"<<endl
 
-vector<vector<pair<int,int>>> dp(5000,vector<pair<int,int>>(5000,{-1,-1}));
-vector<int> v(5000);
+int n;
+int v[5000];
+int dp[5000][5000];
 
-pair<int,int> solve (int i, int j)
+
+int solve (int i, int j)
 {
-    if(dp[i][j].first != -1)return dp[i][j];
-    if(i == j)
-    {
-        return dp[i][j] = {v[i],0};
-    }
-
-    auto left = solve(i+1,j);
-    auto right = solve(i,j-1);
-    pair<int,int> ans = {left.second + v[i],left.first};
-    ans = max(ans, make_pair(right.second + v[j] , right.first));
-    return dp[i][j]=  ans;
+    if(dp[i][j] != -INF) return dp[i][j];
+    bool turn = ((j - i + 1) ^ n ^ 1) & 1;
+    if(i == j) return dp[i][j] = v[i] * (turn ? 1 : 0);
+    int f = solve(i + 1, j) + (turn ? v[i] : 0);
+    int s = solve(i, j - 1) + (turn ? v[j] : 0);
+    if(turn) return dp[i][j] = max(f,s);
+    else return dp[i][j] = min(f,s);
 }
 
 
@@ -63,11 +61,10 @@ int32_t main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL); cout.tie(NULL);
     cout.precision(numeric_limits<double>::max_digits10);
-    // freopen("input.txt","r",stdin);
+    // freopen("test_input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int n;
-    cin>>n;
-    for(int i=0;i<n;i++)cin>>v[i];
-    
-    cout<<solve(0,n-1).first<<endl;
+    cin >> n;
+    for(int i=0;i<n;i++) cin>>v[i];
+    for(int i=0;i<n;++i) for(int j=0;j<n;++j) dp[i][j] = -INF;
+    cout<<solve(0,n-1)<<endl;
 }
