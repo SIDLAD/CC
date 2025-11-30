@@ -1,0 +1,22 @@
+[00:18:21.997] Thread 1 STARTED
+[00:18:21.997] Thread 2 STARTED
+[00:18:22.97] Thread 2 - Iteration 0
+[00:18:22.97] Thread 1 - Iteration 0
+[00:18:22.198] Thread 1 - Iteration 1
+[00:18:22.198] Thread 2 - Iteration 1
+[00:18:22.298] Thread 2 - Iteration 2
+[00:18:22.298] Thread 1 - Iteration 2
+[00:18:22.398] Thread 2 - Iteration 3
+[00:18:22.398] Thread 1 - Iteration 3
+[00:18:22.499] Thread 1 - Iteration 4
+[00:18:22.499] Thread 2 - Iteration 4
+[00:18:22.599] Thread 1 - Iteration 5
+[00:18:22.599] Thread 2 - Iteration 5
+[00:18:22.700] Thread 1 - Iteration 6
+[00:18:22.700] Thread 2 - Iteration 6
+[00:18:22.800] Thread 1 - Iteration 7
+[00:18:22.800] Thread 2 - Iteration 7
+[00:18:22.900] Thread 1 - Iteration 8
+[00:18:22.900] Thread 2 - Iteration 8
+[00:18:23.1] Thread 2 - Iteration 9
+[00:18:23.1] Thread 1 - Iteration 9
