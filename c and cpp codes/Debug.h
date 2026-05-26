@@ -7,6 +7,9 @@ using namespace std;
 template<int _MOD>
 void __print(Mint<_MOD> x) {cerr << x;}
 #endif
+#ifdef MINT_MACRO_RUNTIME_MOD
+void __print(Mint x) {cerr << x;}
+#endif
 void __print(int x) {cerr << x;}
 void __print(long x) {cerr << x;}
 void __print(long long x) {cerr << x;}
