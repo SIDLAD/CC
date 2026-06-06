@@ -54,67 +54,86 @@ typedef long long ll;
 typedef pair<int, int> pii;
 typedef vector<int> vi;
 
+struct Sum{
+    int l, r, t, m;
+    Sum(int x):
+        m(max(0ll, x)), l(max(0ll, x)), r(max(0ll, x)), t(x) {}
+    Sum operator+ (const Sum& o) const {
+        debug(l, r, t, m);
+        debug(o.l, o.r, o.t, o.m);
+        Sum s(0);
+        s.l = max(l, t + o.l);
+        s.r = max(o.r, o.t + r);
+        s.t = t + o.t;
+        s.m = max({m, o.m, r + o.l});
+        debug(s.m);
+        debug();
+        return s;
+    }
+};
 
-template <typename T = int, typename V = T>
+
+
+template <typename T = Sum, typename V = T>
 struct segtree
 {
     int n;
     vector<T> tree;
-    vector<V> lazy;
-    T zero = -INF; // Change according to QUERY operation
-    V lazy_zero = 0; // Change according to MODIFY operation
+    // vector<V> lazy;
+    T zero = 0; // Change according to QUERY operation
+    // V lazy_zero = 0; // Change according to MODIFY operation
 
     segtree(int sz)
     {
         n = sz;
         tree.clear();
-        lazy.clear();
-        tree.resize(2 * sz - 1, -1);
-        lazy.resize(2 * sz - 1, lazy_zero);
+        // lazy.clear();
+        tree.resize(2 * sz - 1, zero);
+        // lazy.resize(2 * sz - 1, lazy_zero);
     }
 
-    // template <typename U>
-    // segtree(vector<U> &v) : segtree(v.size())
-    // {
-        // build(v);
-    // }
+    template <typename U>
+    segtree(vector<U> &v) : segtree(v.size())
+    {
+        build(v);
+    }
 
     T combine(T a, T b)
     {
         // Change according to QUERY operation
-        return max(a,b);
+        return a + b;
     }
 
-    // template <typename U>
-    // void build(vector<U> &v, int id = 0, int segl = 0, int segr = -1)
-    // {
-        // if (segr == -1)segr = n - 1;
-        // if (segl == segr)
-        // {
-            // tree[id] = v[segl];  // Change according to MODIFY operation
-            // return;
-        // }
-        // int mid = (segl + segr) / 2;
-        // build(v, id + 1, segl, mid);
-        // build(v, id + 2 * (mid - segl + 1), mid + 1, segr);
-        // tree[id] = combine(tree[id + 1], tree[id + 2 * (mid - segl + 1)]);
-    // }
-
-    void propagate(int id, int segl, int segr)
+    template <typename U>
+    void build(vector<U> &v, int id = 0, int segl = 0, int segr = -1)
     {
-        if(lazy[id] == lazy_zero)return;
-        if(segl != segr)
+        if (segr == -1)segr = n - 1;
+        if (segl == segr)
         {
-            int mid = (segl + segr) / 2;
-            array<int , 2> children= {id + 1, id + 2 * (mid - segl + 1)};
-            for(auto child : children)
-            {
-                tree[child] += lazy[id];  // Change according to MODIFY operation
-                lazy[child] += lazy[id];  // Change according to MODIFY operation
-            }
+            tree[id] = v[segl];  // Change according to MODIFY operation
+            return;
         }
-        lazy[id] = lazy_zero;
+        int mid = (segl + segr) / 2;
+        build(v, id + 1, segl, mid);
+        build(v, id + 2 * (mid - segl + 1), mid + 1, segr);
+        tree[id] = combine(tree[id + 1], tree[id + 2 * (mid - segl + 1)]);
     }
+
+    // void propagate(int id, int segl, int segr)
+    // {
+        // if(lazy[id] == lazy_zero)return;
+        // if(segl != segr)
+        // {
+            // int mid = (segl + segr) / 2;
+            // array<int , 2> children= {id + 1, id + 2 * (mid - segl + 1)};
+            // for(auto child : children)
+            // {
+                // tree[child] = lazy[id];  // Change according to MODIFY operation
+                // lazy[child] = lazy[id];  // Change according to MODIFY operation
+            // }
+        // }
+        // lazy[id] = lazy_zero;
+    // }
 
     template <typename U>
     void modify(U val, int index_l, int index_r, int id = 0, int segl = 0, int segr = -1)
@@ -124,12 +143,12 @@ struct segtree
         {
             return;
         }
-        propagate(id, segl, segr);
+        // propagate(id, segl, segr);
         
         if (segl >= index_l && segr <= index_r)
         {
-            tree[id] += val; // Change according to MODIFY operation
-            lazy[id] += val; // Change according to MODIFY operation
+            tree[id] = val; // Change according to MODIFY operation
+            // lazy[id] = val; // Change according to MODIFY operation
             return;
         }
         int mid = (segl + segr) / 2;
@@ -147,7 +166,7 @@ struct segtree
         {
             return zero;
         }
-        propagate(id, segl, segr);
+        // propagate(id, segl, segr);
         
         if (segl >= index_l && segr <= index_r)
         {
@@ -159,35 +178,8 @@ struct segtree
         return combine(leftVal, rightVal);
     }
     auto query(int index) { return query(index, index); }
-
-    int walkR(int thresh, int id=0, int segl=0, int segr = -1) {
-        if(segr == -1) segr = n - 1;
-        if(tree[id] < thresh) return -1;
-        propagate(id, segl, segr);
-        if(segl == segr) return segl;
-        int mid = segl + segr >> 1;
-        if(int rightWalk = walkR(thresh, id + 2 * (mid - segl + 1), mid + 1, segr); rightWalk != -1)
-            return rightWalk;
-        return walkR(thresh, id + 1, segl, mid);
-    }
-
-    void update(int len, int mxD) {
-        debug(len, mxD);
-        assert(len <= mxD);
-        int mx = query(mxD - len, mxD - 1);
-        int mxLi = walkR(mx + 1)     + 1;
-        int mxRi = walkR(mx);
-        if(mxRi > mxD - 1) mxRi = mxD - 1;
-        int mxC = mxRi - (mxD - len) + 1;
-        debug(mx, mxLi, mxRi, mxC);
-        debug();
-        modify(1, mxRi + 1, mxD - 1); // mxD - 1 - mxRi - 1 + 1 = mxD - mxRi - 1
-        debug("=============");
-        debug();
-        modify(1, mxLi, mxLi + mxC - 1); // mxLi + mxRi - mxD + len + 1 - 1 - mxLi + 1 = mxRi - mxD + 1 + len
-                                         // total = mxD - mxRi - 1 + mxRi - mxD + 1 + len = len
-    }
 };
+
 
 
 signed main(){
@@ -196,24 +188,25 @@ signed main(){
     cout.precision(numeric_limits<double>::max_digits10);
     // freopen("input.txt","r",stdin);
     // freopen("output.txt","w",stdout);
-    int T = 1;
-    // cin >> T;
     
-    for(int TT = 1; TT <= T; ++TT)
-    {
-        int n;
-        cin >> n;
-        vector<pii> hk(n);
-        int mx = 0;
-        for(auto& p: hk) cin >> p.first >> p.second, mx = max(mx, p.first);
-        // sort(all(hk));
-        segtree st(mx);
-        for(auto [h, k]: hk) st.update(k, h);
-        vector<int> ansArr;
-        for(int i=0;i<mx; ++i) ansArr.push_back(st.query(i));
-        debug(ansArr);
-        int ans = 0;
-        for(auto e: ansArr) ans += e * (e + 1) >> 1;
-        cout << ans << endl;
+    int n,q;
+    cin >> n >> q;
+    vi x(n);
+    arrput(x);
+
+    segtree s(x);
+
+    while(q--) {
+        int t;
+        cin >> t;
+        if(t == 1) {
+            int k, u;
+            cin >> k >> u;
+            s.modify(u, --k);
+        } else {
+            int a, b;
+            cin >> a >> b;
+            cout << s.query(--a, --b).l << endl;
+        }
     }
 }

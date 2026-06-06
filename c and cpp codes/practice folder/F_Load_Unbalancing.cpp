@@ -90,6 +90,41 @@ signed main(){
 
         // cout << ll + a[n-1] << endl;
 
+        // int n, k;
+        // cin >> n >> k;
+        // vi a(n);
+        // arrput(a);
+        // sort(all(a));
+        // --n;
+        // vector<int> W(1 << n);
+        // for(int i=0;i<n;++i) W[1 << i] = a[i];
+        // for(int i=1;i< (1 << n); ++i) {
+        //     int trailing = __builtin_ctz(i);
+        //     assert(trailing < n);
+        //     W[i] = W[i ^ 1 << trailing] + W[1 << trailing];
+        // }
+        // vector<int> masks(1 << n);
+        // iota(all(masks), 0);
+
+        // sort(all(masks), [&](auto a, auto b){ return W[a] > W[b]; });
+        // int dp[1 << n] {};
+        // int ans = -1;
+        // for(auto i: masks) {
+        //     int complement = ~i & (1 << n) - 1;
+        //     for(int c=complement;; c = (c - 1) & complement) {
+        //         assert(i | c == i ^ c);
+        //         dp[i ^ c] = max(dp[i ^ c], dp[c] + 1);
+        //         if(dp[i ^ c] == k) {
+        //             ans = W[i];
+        //             goto outer;
+        //         }
+        //         if(c == 0) break;
+        //     }
+        // }
+        // outer:;
+        // assert(ans != -1);
+        // cout << ans + a.back() << endl;
+
         int n, k;
         cin >> n >> k;
         vi a(n);
@@ -103,26 +138,21 @@ signed main(){
             assert(trailing < n);
             W[i] = W[i ^ 1 << trailing] + W[1 << trailing];
         }
-        vector<int> masks(1 << n);
-        iota(all(masks), 0);
 
-        sort(all(masks), [&](auto a, auto b){ return W[a] > W[b]; });
-        int dp[1 << n] {};
-        int ans = -1;
-        for(auto i: masks) {
-            int complement = ~i & (1 << n) - 1;
-            for(int c=complement;; c = (c - 1) & complement) {
-                assert(i | c == i ^ c);
-                dp[i ^ c] = max(dp[i ^ c], dp[c] + 1);
-                if(dp[i ^ c] == k) {
-                    ans = W[i];
-                    goto outer;
-                }
-                if(c == 0) break;
+        vector<pair<int,int>> dp(1 << n);
+        for(int i=1;i < 1 << n; ++i) {
+            int complement = (1 << n) - 1 & ~i;
+            int remWt = W[complement];
+            for(int bit = 0; bit < n; ++bit) if(i >> bit & 1) {
+                auto cur = dp[i ^ 1 << bit];
+                cur.second += a[bit];
+                if(k - cur.first - 1 > 0 and cur.second * (k - cur.first - 1) >= remWt) cur.second = 0, cur.first++;
+                dp[i] = max(dp[i], cur);
             }
         }
-        outer:;
-        assert(ans != -1);
-        cout << ans + a.back() << endl;
+        debug(dp);
+        auto [mxG, mxW] = dp[(1 << n) - 1];
+        if(mxG < k - 1) mxW = 0;
+        cout << mxW + a[n] << endl;
     }
 }
